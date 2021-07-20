@@ -1,8 +1,17 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@patrikvince 
 import os
-import time
+# import time
 
 import discord
-import schedule
+# import schedule
 import youtube_dl
 from discord.ext import commands
 
@@ -124,11 +133,7 @@ async def stop(ctx):
     voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
     voice.stop()
 
-
-# Run the bot
-bot.run(auth[1])
-
-
+"""
 # Auto play not working yet
 def autoplay(url: str):
     play(url)
@@ -141,29 +146,44 @@ schedule.every().day.at("00:00").do(autoplay, url="https://www.youtube.com/watch
 while True:
     schedule.run_pending()
     time.sleep(1)
+"""
 
 # RIOT API
 
 watcher = LolWatcher(auth[2])
 
-
 @bot.command()
 async def stat(ctx, summoner_name):
-    summoner = watcher.summoner.by_name('eun1', summoner_name)
-    stats = watcher.league.by_summoner('eun1', summoner['id'])
-    print(stats)
     try:
-        tier = stats[0]['tier']
-        rank = stats[0]['rank']
-        lp = stats[0]['leaguePoints']
-        wins = stats[0]['wins']
-        losses = stats[0]['losses']
-        win_rate = wins / (wins + losses) * 100
-        win_rate = round(win_rate, 2)
+        summoner = watcher.summoner.by_name('eun1', summoner_name)
+        stats = watcher.league.by_summoner('eun1', summoner['id'])
+        print(stats)
+        try:
+            tier = stats[0]['tier']
+            rank = stats[0]['rank']
+            lp = stats[0]['leaguePoints']
+            wins = stats[0]['wins']
+            losses = stats[0]['losses']
+            win_rate = wins / (wins + losses) * 100
+            win_rate = round(win_rate, 2)
 
-        respond = tier + " " + rank + " " + str(lp) + " lp\nWins: " + str(wins) + " Losses: " + str(losses)
-        " Win rate: " + str(win_rate) + "%"
+            respond = tier + " " + rank + " " + str(lp) + " lp\nWins: " + str(
+                wins) + " Losses: " + str(losses) + "\nWin rate: " + str(
+                    win_rate) + "%"
 
-        await ctx.send(respond)
-    except IndexError:
-        await ctx.send("Unranked")
+            await ctx.send(respond)
+        except IndexError:
+            await ctx.send("Unranked")
+    except ApiError as err:
+        if err.response.status_code == 404:
+            await ctx.send("Nincs ilyen idéző!")
+        elif err.response.status_code == 401:
+            await ctx.send("API kulcs error!")
+        else:
+            await ctx.send("Hiba!")
+
+
+# Run the bot
+bot.run(auth[1])
+
+
