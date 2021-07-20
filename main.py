@@ -1,19 +1,11 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@patrikvince 
 import os
 # import time
-
 import discord
 # import schedule
 import youtube_dl
 from discord.ext import commands
+from keep_alive import keep_alive
+from riotwatcher import LolWatcher, ApiError
 
 # file reading
 with open("Keys.txt") as f:
@@ -182,6 +174,9 @@ async def stat(ctx, summoner_name):
         else:
             await ctx.send("Hiba!")
 
+
+# auto run
+keep_alive()
 
 # Run the bot
 bot.run(auth[1])
